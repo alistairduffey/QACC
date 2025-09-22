@@ -126,6 +126,29 @@ def get_all_vars_spatial_arctic_monthly(vars, model, scenario,
     return DS_monthly
 
 
+def get_all_vars_spatial_monthly(vars, model, scenario,
+                                min_year="2080", max_year="2100"):
+    ds_list = []
+    for var in tqdm(vars):
+        print(var)
+        try:
+            ds = read_in_ens_mean(get_dirs(var, model, scenario, table='Amon'),
+                                  ocean=False, zonal_mean=False,
+                                  max_ens_members=5)
+        except: 
+            ds = read_in_ens_mean(get_dirs(var, model, scenario, table='AERmon'),
+                                  ocean=False, zonal_mean=False,
+                                  max_ens_members=5)
+        ds_list.append(ds)
+    
+    DS = xr.merge(ds_list, compat='override')
+    
+    ## take late-century monthly time-mean
+    DS_monthly = DS.sel(time=slice(min_year, max_year)).groupby("time.month").mean(dim="time")
+    
+    return DS_monthly
+
+
 def get_surface_area_north_of_lat(min_lat):
     path = '/badc/cmip6/data/CMIP6/CMIP/MOHC/UKESM1-0-LL/piControl/r1i1p1f2/fx/areacella/gn/latest/areacella_fx_UKESM1-0-LL_piControl_r1i1p1f2_gn.nc'
     areacella = rename_cmip6(xr.open_dataset(path))

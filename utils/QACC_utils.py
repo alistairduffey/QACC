@@ -43,6 +43,7 @@ def read_in_ens_mean(dirs, ocean = False, zonal_mean=False, max_ens_members=Fals
     return ds
 
 
+
 def get_gmst(ds):
     return calc_spatial_mean(ds.tas.mean(dim="time"), lon_name="x", lat_name="y").values
 
@@ -119,6 +120,29 @@ def get_all_vars_spatial_arctic_monthly(vars, model, scenario,
     
     ## take an arctic spatial mean:
     DS = DS.sel(y=slice(min_lat, max_lat))
+    
+    ## take late-century monthly time-mean
+    DS_monthly = DS.sel(time=slice(min_year, max_year)).groupby("time.month").mean(dim="time")
+    
+    return DS_monthly
+
+
+def get_all_vars_spatial_monthly(vars, model, scenario,
+                                min_year="2080", max_year="2100"):
+    ds_list = []
+    for var in tqdm(vars):
+        print(var)
+        try:
+            ds = read_in_ens_mean(get_dirs(var, model, scenario, table='Amon'),
+                                  ocean=False, zonal_mean=False,
+                                  max_ens_members=5)
+        except: 
+            ds = read_in_ens_mean(get_dirs(var, model, scenario, table='AERmon'),
+                                  ocean=False, zonal_mean=False,
+                                  max_ens_members=5)
+        ds_list.append(ds)
+    
+    DS = xr.merge(ds_list, compat='override')
     
     ## take late-century monthly time-mean
     DS_monthly = DS.sel(time=slice(min_year, max_year)).groupby("time.month").mean(dim="time")
