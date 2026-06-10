@@ -43,11 +43,3 @@ def weighted_annual_resample(ds, var):
     ds_out['year'] = ds_out.time.dt.year
     return ds_out
 
-
-
-def spatial_mean(ds, region, lat_band_dict):
-    ds_ts = ds.sel(y=slice(lat_band_dict[region][0], lat_band_dict[region][1]))
-    ds_ts_yearly = ds_ts.mean(dim=['x'])
-    weights = np.cos(np.deg2rad(ds_ts_yearly['y']))
-    ds_ts_yearly = ds_ts_yearly.weighted(weights).mean(dim='y')
-    return ds_ts_yearly
