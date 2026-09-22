@@ -1,2 +1,2 @@
-A 2nd (nth?) attempt at QACC, this time using the ClimKern package - https://github.com/tyfolino/climkern
+Code for all processing and analysis in Duffey et al. Contributions to Arctic Amplification of Cooling under Stratospheric Aerosol Injection
 
